@@ -5,7 +5,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'https://realtimechat-4uzm.onrender.com',
+    origin: 'http://localhost:3000',
     credentials: true,
   });
 
