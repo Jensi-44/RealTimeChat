@@ -32,7 +32,7 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0f1d] to-[#0f172a] text-white flex items-center justify-center px-4">
       <div className="flex flex-col lg:flex-row items-center gap-16 max-w-5xl">
-        {/* LEFT SECTION */}
+  
         <div className="text-left max-w-md">
           <h1 className="text-4xl font-extrabold leading-tight">
             Create Your <span className="text-blue-500">Account</span>
@@ -42,7 +42,6 @@ export default function Signup() {
           </p>
         </div>
 
-        {/* SIGNUP CARD */}
         <div className="bg-[#111827] border border-gray-700 shadow-xl shadow-blue-900/20 p-10 rounded-2xl w-[380px]">
           <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
 
