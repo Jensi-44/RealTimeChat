@@ -6,6 +6,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: ['http://localhost:3000', 'https://realtimechat-4uzm.onrender.com'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });
 
