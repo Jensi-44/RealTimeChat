@@ -10,19 +10,17 @@ export default function ChatPage() {
 
   useEffect(() => {
     socket.on("message", (data) => {
-      setChat((prev) => [...prev, { text: data, sender: "other" }]);
+      setChat((prev) => [...prev, data]);
     });
 
-    return () => {
-      socket.off("message");
-    };
+    return () => socket.off("message");
   }, []);
 
   const sendMessage = () => {
     if (!message.trim()) return;
 
-    setChat((prev) => [...prev, { text: message, sender: "me" }]);
-    socket.emit("message", message);
+    // send sender + text
+    socket.emit("message", { text: message, sender: "me" });
     setMessage("");
   };
 
