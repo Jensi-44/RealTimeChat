@@ -9,7 +9,7 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://realtimechat-4uzm.onrender.com'],
   },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
