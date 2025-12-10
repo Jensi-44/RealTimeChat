@@ -38,6 +38,10 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: user.id });
 
-    return { message: 'Login Successful', token };
+    return {
+      message: 'Login Successful',
+      user: { username: user.username },
+      token,
+    };
   }
 }

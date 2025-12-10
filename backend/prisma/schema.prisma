@@ -14,3 +14,19 @@ model User {
   password  String
   createdAt DateTime @default(now())
 }
+
+model ChatRoom {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  user1     String
+  user2     String
+  messages  Message[]  @relation("RoomMessages")
+}
+
+model Message {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  roomId    String
+  room      ChatRoom  @relation("RoomMessages", fields: [roomId], references: [id])
+  senderId  String
+  text      String
+  createdAt DateTime @default(now())
+}

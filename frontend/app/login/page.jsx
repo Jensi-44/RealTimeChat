@@ -22,10 +22,14 @@ export default function Login() {
     });
 
     const data = await res.json();
+
     if (data.token) {
+      // SAVE AUTH DETAILS
       localStorage.setItem("token", data.token);
+      localStorage.setItem("username", data.user.username); // <---- IMPORTANT FIX
       document.cookie = `token=${data.token}; path=/`;
-      router.push("/dashboard");
+
+      router.push("/dashboard"); // Where user lands after login
     } else {
       setError("Invalid username or password");
     }
@@ -34,18 +38,15 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0f1d] to-[#0f172a] text-white flex items-center justify-center px-4">
       <div className="flex flex-col lg:flex-row items-center gap-16 max-w-5xl">
-        {/* LEFT HERO SECTION */}
         <div className="text-left max-w-md">
           <h1 className="text-4xl font-extrabold leading-tight">
             Welcome to <span className="text-blue-500">Realtime Chat</span>
           </h1>
           <p className="mt-4 text-gray-300 text-lg">
-            Chat instantly with your team, track tasks, and stay connected — all
-            in one place.
+            Fast, secure and realtime private messaging.
           </p>
         </div>
 
-        {/* LOGIN CARD */}
         <div className="bg-[#111827] border border-gray-700 shadow-xl shadow-blue-900/20 p-10 rounded-2xl w-[380px]">
           <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 

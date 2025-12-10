@@ -6,7 +6,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: ['http://localhost:3000', 'https://real-time-chat-navy.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
 
