@@ -3,6 +3,7 @@ import {
   WebSocketServer,
   SubscribeMessage,
   MessageBody,
+  ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
@@ -10,10 +11,20 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
+interface PrivateMessagePayload {
+  sender: string;
+  receiver: string;
+  text: string;
+}
+
+interface JoinRoomPayload {
+  sender: string;
+  receiver: string;
+}
+
 @WebSocketGateway({
   cors: {
     origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST'],
     credentials: true,
   },
 })
@@ -27,55 +38,64 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   handleConnection(client: Socket) {
-    console.log('🔌 Client connected:', client.id);
+    console.log('Client connected:', client.id);
   }
 
   handleDisconnect(client: Socket) {
-    console.log('❌ Client disconnected:', client.id);
+    console.log('Client disconnected:', client.id);
   }
 
-  // 🟢 JOIN ROOM (sender + receiver)
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(
-    client: Socket,
-    payload: { sender: string; receiver: string },
+  async handleJoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: JoinRoomPayload,
   ) {
-    const roomId = [payload.sender, payload.receiver].sort().join('_');
-    client.join(roomId);
-    console.log('🟢 Joined Room:', roomId);
+    try {
+      const room = await this.chatService.getOrCreateRoom(
+        payload.sender,
+        payload.receiver,
+      );
+      const socketRoom = room.roomKey;
+
+      client.join(socketRoom);
+      console.log(`User ${payload.sender} joined room: ${socketRoom}`);
+
+      const messages = await this.chatService.getMessagesForRoom(room.id);
+
+      client.emit('chatHistory', { messages });
+    } catch (error) {
+      console.error('Join room error:', error);
+      client.emit('error', { message: 'Failed to join room' });
+    }
   }
 
-  // ✉ PRIVATE MESSAGE + SAVE + EMIT
   @SubscribeMessage('privateMessage')
-  async handlePrivateMessage(
-    @MessageBody()
-    data: {
-      sender: string;
-      receiver: string;
-      text: string;
-    },
-  ) {
-    const room = await this.chatService.getOrCreateRoom(
-      data.sender,
-      data.receiver,
-    );
+  async handlePrivateMessage(@MessageBody() data: PrivateMessagePayload) {
+    try {
+      const room = await this.chatService.getOrCreateRoom(
+        data.sender,
+        data.receiver,
+      );
+      const socketRoom = room.roomKey;
 
-    const saved = await this.prisma.message.create({
-      data: {
-        roomId: room.id,
-        senderId: data.sender,
+      const savedMessage = await this.prisma.message.create({
+        data: {
+          roomId: room.id,
+          senderId: data.sender,
+          text: data.text,
+        },
+      });
+
+      const messageToSend = {
+        sender: data.sender,
+        receiver: data.receiver,
         text: data.text,
-      },
-    });
+        createdAt: savedMessage.createdAt,
+      };
 
-    console.log('🔥 Emitting to room:', room.id, data);
-
-    this.server.to(room.id).emit('privateMessage', {
-      roomId: room.id,
-      sender: data.sender,
-      receiver: data.receiver,
-      text: data.text,
-      createdAt: saved.createdAt,
-    });
+      this.server.to(socketRoom).emit('privateMessage', messageToSend);
+    } catch (error) {
+      console.error('Send message error:', error);
+    }
   }
 }
