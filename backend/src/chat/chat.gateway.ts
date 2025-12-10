@@ -24,7 +24,7 @@ interface JoinRoomPayload {
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'https://real-time-chat-navy.vercel.app'],
     credentials: true,
   },
 })
