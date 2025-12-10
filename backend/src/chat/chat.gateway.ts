@@ -16,7 +16,6 @@ interface PrivateMessagePayload {
   receiver: string;
   text: string;
 }
-
 interface JoinRoomPayload {
   sender: string;
   receiver: string;

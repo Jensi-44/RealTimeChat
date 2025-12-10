@@ -24,12 +24,11 @@ export default function Login() {
     const data = await res.json();
 
     if (data.token) {
-      // SAVE AUTH DETAILS
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.user.username); // <---- IMPORTANT FIX
+      localStorage.setItem("username", data.user.username);
       document.cookie = `token=${data.token}; path=/`;
 
-      router.push("/dashboard"); // Where user lands after login
+      router.push("/dashboard");
     } else {
       setError("Invalid username or password");
     }

@@ -21,7 +21,6 @@ export default function ChatPage() {
   const [chat, setChat] = useState<Message[]>([]);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  /** 1️⃣ Load logged-in user */
   useEffect(() => {
     const u = localStorage.getItem("username");
     if (!u) {
@@ -31,7 +30,6 @@ export default function ChatPage() {
     setSender(u);
   }, [router]);
 
-  /** 2️⃣ Join Room + Listen Messages + Load Chat History */
   useEffect(() => {
     if (!sender || !receiver) return;
 
@@ -54,12 +52,10 @@ export default function ChatPage() {
     };
   }, [sender, receiver]);
 
-  /** 3️⃣ Auto Scroll to Latest Message */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat]);
 
-  /** 4️⃣ Send Message */
   const sendMessage = () => {
     if (!message.trim()) return;
 
@@ -74,7 +70,6 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex">
-      {/* LEFT SIDEBAR */}
       <aside className="w-64 border-r border-slate-800 bg-[#020617] flex flex-col">
         <div className="p-4 border-b border-slate-800">
           <button
@@ -90,9 +85,7 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      {/* MAIN CHAT BOX */}
       <main className="flex-1 flex flex-col">
-        {/* HEADER */}
         <div className="h-16 border-b border-slate-800 flex items-center px-6 bg-[#020617]">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center text-sm font-semibold">
@@ -104,9 +97,7 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
-
-        {/* MESSAGE LIST */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 bg-[#020617]">
+        <div className="flex-1 px-4 py-3 bg-[#020617] overflow-y-auto max-h-[calc(100vh-8rem)]">
           {chat.length === 0 && (
             <p className="text-center text-xs text-slate-500 mt-10">
               No messages yet. Say hi 👋
@@ -115,7 +106,6 @@ export default function ChatPage() {
 
           {chat.map((msg, idx) => {
             const isMine = msg.sender?.toLowerCase() === sender.toLowerCase();
-
             return (
               <div
                 key={idx}
@@ -125,11 +115,11 @@ export default function ChatPage() {
               >
                 <div
                   className={`max-w-[60%] px-3 py-2 rounded-2xl text-sm shadow 
-                    ${
-                      isMine
-                        ? "bg-emerald-600 rounded-br-none"
-                        : "bg-slate-800 rounded-bl-none"
-                    }`}
+            ${
+              isMine
+                ? "bg-emerald-600 rounded-br-none"
+                : "bg-slate-800 rounded-bl-none"
+            }`}
                 >
                   {!isMine && (
                     <p className="text-[10px] text-emerald-300 mb-1">
@@ -137,7 +127,6 @@ export default function ChatPage() {
                     </p>
                   )}
                   <p>{msg.text}</p>
-
                   {msg.createdAt && (
                     <p className="text-[9px] mt-1 text-slate-400 text-right">
                       {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -153,7 +142,6 @@ export default function ChatPage() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* INPUT BAR */}
         <div className="h-16 border-t border-slate-800 px-4 flex items-center gap-3 bg-[#020617]">
           <input
             className="flex-1 px-3 py-2 rounded-lg bg-[#020617] border border-slate-700 text-sm focus:outline-none focus:border-emerald-500"

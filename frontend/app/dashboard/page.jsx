@@ -33,7 +33,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex">
-      {/* SIDEBAR */}
       <aside className="w-72 border-r border-slate-800 bg-[#020617] flex flex-col">
         <div className="p-4 border-b border-slate-800">
           <h1 className="text-xl font-bold">Realtime Chat</h1>
@@ -50,7 +49,7 @@ export default function Dashboard() {
 
         <div className="flex-1 overflow-y-auto">
           {users
-            .filter((u) => u.username !== currentUser) // hide self
+            .filter((u) => u.username !== currentUser)
             .map((u) => (
               <button
                 key={u.username}
@@ -75,7 +74,6 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* MAIN AREA */}
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-md px-4">
           <h2 className="text-2xl font-semibold mb-2">
