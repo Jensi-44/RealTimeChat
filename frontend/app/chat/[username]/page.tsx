@@ -4,17 +4,24 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { socket } from "../../utils/socket";
 
+interface Message {
+  sender: string;
+  receiver: string;
+  text: string;
+  createdAt?: string;
+}
+
 export default function ChatPage() {
   const params = useParams();
   const router = useRouter();
-  const receiver = params.username;
+  const receiver = params.username as string;
 
-  const [sender, setSender] = useState("");
-  const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([]);
-  const chatEndRef = useRef(null);
+  const [sender, setSender] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [chat, setChat] = useState<Message[]>([]);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Load logged-in user
+  /** 1️⃣ Load logged-in user */
   useEffect(() => {
     const u = localStorage.getItem("username");
     if (!u) {
@@ -24,17 +31,17 @@ export default function ChatPage() {
     setSender(u);
   }, [router]);
 
-  // Join room + listen + load history
+  /** 2️⃣ Join Room + Listen Messages + Load Chat History */
   useEffect(() => {
     if (!sender || !receiver) return;
 
     socket.emit("joinRoom", { sender, receiver });
 
-    const handleHistory = (data) => {
+    const handleHistory = (data: { messages: Message[] }) => {
       setChat(Array.isArray(data.messages) ? data.messages : []);
     };
 
-    const handleMessage = (msg) => {
+    const handleMessage = (msg: Message) => {
       setChat((prev) => [...prev, msg]);
     };
 
@@ -47,12 +54,12 @@ export default function ChatPage() {
     };
   }, [sender, receiver]);
 
-  // Auto scroll
+  /** 3️⃣ Auto Scroll to Latest Message */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat]);
 
-  // Send Message
+  /** 4️⃣ Send Message */
   const sendMessage = () => {
     if (!message.trim()) return;
 
@@ -92,7 +99,7 @@ export default function ChatPage() {
               {receiver?.[0]?.toUpperCase()}
             </div>
             <div>
-              <div className="text-sm font-medium">{receiver}</div>
+              <div className="text-sm font-medium capitalize">{receiver}</div>
               <div className="text-xs text-emerald-400">● Online</div>
             </div>
           </div>
@@ -108,6 +115,7 @@ export default function ChatPage() {
 
           {chat.map((msg, idx) => {
             const isMine = msg.sender?.toLowerCase() === sender.toLowerCase();
+
             return (
               <div
                 key={idx}
@@ -129,6 +137,7 @@ export default function ChatPage() {
                     </p>
                   )}
                   <p>{msg.text}</p>
+
                   {msg.createdAt && (
                     <p className="text-[9px] mt-1 text-slate-400 text-right">
                       {new Date(msg.createdAt).toLocaleTimeString([], {
